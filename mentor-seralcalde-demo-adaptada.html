@@ -1,0 +1,1447 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mentor SerAlcalde® — Demo Gratuita · Fase I</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700;800&family=IBM+Plex+Mono:wght@400;500;600&family=Georgia&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#0A1628;
+    --navy-2:#101F38;
+    --gold:#C9A227;
+    --gold-soft:#E4CD86;
+    --paper:#F6F1E7;
+    --paper-2:#EFE7D6;
+    --ink:#1C2430;
+    --ink-soft:#4A5266;
+    --slate:#64748B;
+    --line:#DDD3BC;
+    --success:#2F7D5D;
+    --danger:#B23A48;
+    --locked:#8A7F63;
+    --serif: Georgia, 'Times New Roman', serif;
+    --display: 'Montserrat', sans-serif;
+    --mono: 'IBM Plex Mono', monospace;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:var(--serif);
+    background:var(--navy);
+    color:var(--ink);
+    min-height:100vh;
+  }
+  ::selection{background:var(--gold-soft);color:var(--navy);}
+  button{font-family:var(--display);cursor:pointer;}
+  a{color:inherit;}
+
+  /* ===================== GATE / LOGIN ===================== */
+  #gate{
+    min-height:100vh;
+    display:flex;align-items:center;justify-content:center;
+    background:
+      radial-gradient(circle at 20% 15%, rgba(201,162,39,0.10), transparent 45%),
+      radial-gradient(circle at 85% 80%, rgba(201,162,39,0.08), transparent 50%),
+      var(--navy);
+    padding:24px;
+  }
+  .gate-card{
+    max-width:460px;width:100%;
+    background:var(--navy-2);
+    border:1px solid rgba(201,162,39,0.35);
+    border-radius:4px;
+    padding:44px 38px;
+    position:relative;
+  }
+  .gate-card::before{
+    content:"";position:absolute;top:0;left:0;right:0;height:3px;
+    background:linear-gradient(90deg,var(--gold),transparent 70%);
+  }
+  .brand-eyebrow{
+    font-family:var(--mono);font-size:11px;letter-spacing:.22em;
+    color:var(--gold);text-transform:uppercase;margin:0 0 6px;
+  }
+  .brand-title{
+    font-family:var(--display);font-weight:800;color:#fff;
+    font-size:28px;line-height:1.15;margin:0 0 4px;letter-spacing:-.01em;
+  }
+  .brand-sub{
+    font-family:var(--serif);font-style:italic;color:#B9C2D4;
+    font-size:15px;margin:0 0 30px;
+  }
+  .gate-card label{
+    display:block;font-family:var(--mono);font-size:11px;color:var(--gold-soft);
+    letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px;
+  }
+  .gate-card input{
+    width:100%;padding:12px 14px;background:#0D1930;border:1px solid #2A3A57;
+    border-radius:3px;color:#fff;font-family:var(--mono);font-size:14px;margin-bottom:18px;
+  }
+  .gate-card input:focus{outline:none;border-color:var(--gold);}
+  .btn-gold{
+    width:100%;padding:13px;background:var(--gold);color:var(--navy);border:none;
+    border-radius:3px;font-weight:700;font-size:14px;letter-spacing:.02em;
+  }
+  .btn-gold:hover{background:var(--gold-soft);}
+  .btn-ghost{
+    width:100%;padding:12px;background:transparent;color:#B9C2D4;border:1px solid #2A3A57;
+    border-radius:3px;font-size:13px;margin-top:10px;
+  }
+  .btn-ghost:hover{border-color:var(--gold);color:#fff;}
+  .gate-note{font-family:var(--mono);font-size:11px;color:#5B6B8A;margin-top:22px;line-height:1.6;}
+  .gate-error{font-family:var(--mono);font-size:12px;color:#E28A94;margin:-8px 0 14px;display:none;}
+
+  /* ===================== APP SHELL ===================== */
+  #app{display:none;min-height:100vh;background:var(--navy);}
+  .shell{display:grid;grid-template-columns:290px 1fr;min-height:100vh;}
+  @media (max-width:880px){ .shell{grid-template-columns:1fr;} }
+
+  /* ---- Sidebar ---- */
+  .sidebar{
+    background:var(--navy);border-right:1px solid rgba(201,162,39,0.18);
+    padding:26px 20px 40px;position:sticky;top:0;height:100vh;overflow-y:auto;
+  }
+  @media (max-width:880px){ .sidebar{position:relative;height:auto;} }
+  .sb-brand{display:flex;align-items:center;gap:10px;margin-bottom:6px;}
+  .sb-mark{width:30px;height:30px;border:1.5px solid var(--gold);border-radius:50%;
+    display:flex;align-items:center;justify-content:center;font-family:var(--display);
+    font-weight:800;color:var(--gold);font-size:13px;flex-shrink:0;}
+  .sb-name{font-family:var(--display);font-weight:800;color:#fff;font-size:15px;line-height:1.2;}
+  .sb-tag{font-family:var(--mono);font-size:10px;color:var(--gold-soft);letter-spacing:.14em;
+    text-transform:uppercase;margin:2px 0 26px 40px;}
+
+  .progress-block{margin-bottom:24px;}
+  .progress-label{font-family:var(--mono);font-size:10.5px;color:#8794AC;letter-spacing:.08em;
+    text-transform:uppercase;display:flex;justify-content:space-between;margin-bottom:8px;}
+  .progress-track{height:5px;background:#182A46;border-radius:3px;overflow:hidden;}
+  .progress-fill{height:100%;background:linear-gradient(90deg,var(--gold),var(--gold-soft));
+    width:0%;transition:width .4s ease;}
+
+  .phase{margin-bottom:4px;}
+  .phase-head{
+    display:flex;align-items:center;gap:10px;padding:11px 8px;border-radius:4px;cursor:pointer;
+    color:#C7CEDD;
+  }
+  .phase-head:hover{background:rgba(255,255,255,0.03);}
+  .phase-num{font-family:var(--mono);font-size:10px;color:var(--gold);width:22px;flex-shrink:0;}
+  .phase-name{font-family:var(--display);font-weight:700;font-size:12.5px;letter-spacing:.02em;flex:1;}
+  .phase-lock{font-size:10px;font-family:var(--mono);color:var(--locked);}
+  .session-list{padding-left:32px;margin:2px 0 10px;display:none;}
+  .phase.open .session-list{display:block;}
+  .phase.open .phase-head .chev{transform:rotate(90deg);}
+  .chev{font-size:10px;color:#5B6B8A;transition:transform .15s ease;}
+  .session-item{
+    display:flex;align-items:center;gap:8px;padding:8px 6px;border-radius:3px;cursor:pointer;
+    font-family:var(--display);font-size:12px;color:#93A0B8;line-height:1.3;
+  }
+  .session-item:hover{color:#fff;}
+  .session-item.active{color:var(--gold-soft);background:rgba(201,162,39,0.08);}
+  .session-item.locked{color:#465577;cursor:default;}
+  .session-check{width:14px;height:14px;border-radius:50%;border:1.5px solid #3B4A6B;flex-shrink:0;}
+  .session-check.done{background:var(--gold);border-color:var(--gold);}
+  .locked-note{padding-left:32px;font-family:var(--mono);font-size:10.5px;color:var(--locked);
+    line-height:1.6;margin:2px 0 10px;display:none;}
+  .phase.open .locked-note{display:block;}
+
+  .sb-footer{margin-top:20px;padding-top:18px;border-top:1px solid rgba(255,255,255,0.08);}
+  .sb-license{font-family:var(--mono);font-size:10.5px;color:#5B6B8A;margin-bottom:10px;}
+  .sb-license b{color:var(--gold-soft);}
+  .mentor-toggle{
+    width:100%;padding:11px;background:transparent;border:1px solid var(--gold);border-radius:3px;
+    color:var(--gold-soft);font-family:var(--mono);font-size:11.5px;letter-spacing:.04em;
+    display:flex;align-items:center;justify-content:center;gap:8px;
+  }
+  .mentor-toggle:hover{background:rgba(201,162,39,0.1);}
+
+  /* ---- Main reading pane ---- */
+  .main{background:var(--paper);min-height:100vh;position:relative;}
+  .topbar{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:16px 44px;border-bottom:1px solid var(--line);background:var(--paper);
+    position:sticky;top:0;z-index:5;
+  }
+  @media (max-width:880px){ .topbar{padding:14px 20px;} }
+  .topbar-crumb{font-family:var(--mono);font-size:11px;color:var(--slate);letter-spacing:.05em;}
+  .topbar-crumb b{color:var(--ink);}
+  .export-btn{
+    background:var(--navy);color:var(--gold-soft);border:none;padding:8px 16px;border-radius:3px;
+    font-family:var(--mono);font-size:11px;letter-spacing:.04em;
+  }
+  .export-btn:hover{background:var(--navy-2);}
+
+  .page{max-width:680px;margin:0 auto;padding:56px 24px 120px;}
+  .folio-top{font-family:var(--mono);font-size:10.5px;color:var(--slate);text-align:center;
+    letter-spacing:.14em;text-transform:uppercase;margin-bottom:18px;}
+  .session-eyebrow{font-family:var(--mono);font-size:11px;color:var(--gold);letter-spacing:.14em;
+    text-transform:uppercase;margin-bottom:10px;}
+  .session-title{font-family:var(--display);font-weight:800;font-size:32px;color:var(--navy);
+    line-height:1.12;margin:0 0 10px;letter-spacing:-.01em;}
+  .session-subtitle{font-family:var(--serif);font-style:italic;font-size:17px;color:var(--ink-soft);
+    margin:0 0 30px;}
+  .pull-quote{
+    border-left:3px solid var(--gold);padding:4px 0 4px 20px;margin:0 0 38px;
+    font-family:var(--serif);font-style:italic;font-size:18px;color:var(--navy);line-height:1.5;
+  }
+  .body-text{font-family:var(--serif);font-size:17px;line-height:1.85;color:var(--ink);}
+  .body-text p{margin:0 0 20px;}
+  .body-text strong{color:var(--navy);}
+  .section-h{font-family:var(--display);font-weight:700;font-size:15px;color:var(--navy);
+    letter-spacing:.01em;margin:44px 0 16px;padding-top:22px;border-top:1px solid var(--line);}
+  .body-text ul{margin:0 0 20px;padding-left:22px;}
+  .body-text li{margin-bottom:8px;}
+
+  .idea-clave{
+    background:var(--navy);color:#EDE6D2;border-radius:4px;padding:26px 28px;margin:44px 0 26px;
+    position:relative;
+  }
+  .idea-clave::before{content:"";position:absolute;top:0;left:0;width:3px;height:100%;background:var(--gold);}
+  .idea-clave .lbl{font-family:var(--mono);font-size:10px;letter-spacing:.16em;color:var(--gold-soft);
+    text-transform:uppercase;margin-bottom:10px;}
+  .idea-clave p{font-family:var(--serif);font-size:16px;line-height:1.6;margin:0;}
+  .frase{font-family:var(--serif);font-style:italic;font-size:16px;color:var(--ink-soft);
+    text-align:center;margin:0 0 44px;padding:0 20px;}
+
+  .exercise-card{
+    background:var(--paper-2);border:1px dashed var(--locked);border-radius:4px;
+    padding:26px 26px 20px;margin:36px 0;
+  }
+  .exercise-card .lbl{font-family:var(--mono);font-size:10px;letter-spacing:.14em;color:var(--navy);
+    text-transform:uppercase;margin-bottom:4px;}
+  .exercise-card h4{font-family:var(--display);font-weight:700;font-size:17px;color:var(--navy);
+    margin:0 0 14px;}
+  .exercise-card .prompt{font-family:var(--serif);font-size:15px;color:var(--ink-soft);margin-bottom:8px;}
+  .exercise-card textarea{
+    width:100%;min-height:70px;font-family:var(--serif);font-size:15px;color:var(--ink);
+    background:#fff;border:1px solid var(--line);border-radius:3px;padding:10px 12px;
+    resize:vertical;line-height:1.5;margin-bottom:16px;
+  }
+  .exercise-card textarea:focus{outline:none;border-color:var(--gold);}
+  .pdf-attach-row{display:flex;align-items:center;flex-wrap:wrap;gap:10px;margin:-6px 0 4px;}
+  .pdf-upload-btn{
+    display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border:1px dashed var(--navy);
+    border-radius:20px;font-family:var(--mono);font-size:10.5px;color:var(--navy);cursor:pointer;
+    background:#fff;user-select:none;
+  }
+  .pdf-upload-btn:hover{border-style:solid;background:var(--paper-2);}
+  .pdf-status{font-family:var(--mono);font-size:10.5px;}
+  .pdf-chip{
+    display:inline-flex;align-items:center;gap:6px;padding:5px 10px;background:var(--navy);
+    color:var(--gold-soft);border-radius:20px;font-size:10.5px;
+  }
+  .pdf-chip button{
+    background:none;border:none;color:var(--gold-soft);font-size:13px;line-height:1;cursor:pointer;
+    padding:0;opacity:.8;
+  }
+  .pdf-chip button:hover{opacity:1;color:#fff;}
+  .pdf-status.loading{color:var(--slate);}
+  .pdf-status.error{color:var(--danger);}
+  .img-thumb{width:34px;height:34px;object-fit:cover;border-radius:4px;margin-right:2px;vertical-align:middle;}
+
+  /* ---- Book piece badge on exercise card ---- */
+  .exercise-card.is-book-piece{border-style:solid;border-color:var(--gold);}
+  .book-piece-badge{
+    display:inline-block;font-family:var(--mono);font-size:10px;letter-spacing:.04em;
+    color:var(--navy);background:var(--gold-soft);padding:5px 10px;border-radius:20px;margin-bottom:14px;
+  }
+
+  /* ---- Libro Estratégico compiled view ---- */
+  .book-cover{text-align:center;padding-bottom:30px;margin-bottom:10px;border-bottom:2px solid var(--navy);}
+  .book-cover .session-title{margin-top:10px;}
+  .book-cover .session-subtitle{font-style:normal;font-family:var(--mono);font-size:12px;color:var(--slate);}
+  .book-toc{margin:30px 0 10px;}
+  .book-toc-item{
+    display:flex;gap:10px;align-items:baseline;padding:6px 0;font-family:var(--mono);font-size:11.5px;
+    color:var(--ink-soft);border-bottom:1px dotted var(--line);cursor:pointer;
+  }
+  .book-toc-item:hover{color:var(--navy);}
+  .book-toc-item .dot{width:8px;height:8px;border-radius:50%;background:var(--line);flex-shrink:0;}
+  .book-toc-item.done .dot{background:var(--gold);}
+  .book-chapter{padding:34px 0;border-bottom:1px solid var(--line);}
+  .book-chapter:last-child{border-bottom:none;}
+  .book-chapter-num{font-family:var(--mono);font-size:10.5px;color:var(--gold);letter-spacing:.1em;
+    text-transform:uppercase;margin-bottom:6px;}
+  .book-chapter-title{font-family:var(--display);font-weight:800;font-size:19px;color:var(--navy);margin:0 0 14px;}
+  .book-chapter-body{font-family:var(--serif);font-size:15.5px;line-height:1.75;color:var(--ink);white-space:normal;}
+  .book-chapter-body em{color:var(--locked);font-style:italic;}
+  .book-chapter-empty .book-chapter-title{color:var(--slate);}
+  .book-chapter-attach{margin-top:10px;font-family:var(--mono);font-size:10.5px;color:var(--slate);}
+  .save-hint{font-family:var(--mono);font-size:10px;color:var(--success);opacity:0;transition:opacity .3s;}
+  .save-hint.show{opacity:1;}
+
+  .tool-card{
+    background:#fff;border:1px solid var(--gold);border-radius:4px;padding:26px 28px;margin:36px 0;
+  }
+  .tool-card .lbl{font-family:var(--mono);font-size:10px;letter-spacing:.14em;color:var(--gold);
+    text-transform:uppercase;margin-bottom:6px;}
+  .tool-card h4{font-family:var(--display);font-weight:700;font-size:17px;color:var(--navy);margin:0 0 12px;}
+  .tool-card .body-text{font-size:15px;}
+
+  .checklist{margin:36px 0;}
+  .checklist h4{font-family:var(--display);font-weight:700;font-size:15px;color:var(--navy);margin:0 0 14px;}
+  .check-item{display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid var(--line);
+    font-family:var(--serif);font-size:15.5px;color:var(--ink);cursor:pointer;}
+  .check-item input{margin-top:4px;width:15px;height:15px;accent-color:var(--gold);flex-shrink:0;}
+  .check-item.checked{color:var(--slate);text-decoration:line-through;text-decoration-color:var(--gold);}
+
+  .advance-box{
+    margin:50px 0 0;padding-top:26px;border-top:2px solid var(--navy);
+  }
+  .advance-box .lbl{font-family:var(--mono);font-size:10px;letter-spacing:.14em;color:var(--slate);
+    text-transform:uppercase;margin-bottom:10px;}
+  .advance-box p{font-family:var(--serif);font-size:15.5px;color:var(--ink-soft);line-height:1.7;}
+
+  .nav-pagers{display:flex;justify-content:space-between;margin-top:44px;gap:12px;}
+  .pager-btn{
+    flex:1;padding:14px 18px;border:1px solid var(--navy);border-radius:3px;background:transparent;
+    font-family:var(--mono);font-size:11.5px;color:var(--navy);text-align:left;letter-spacing:.02em;
+  }
+  .pager-btn:hover{background:var(--navy);color:#fff;}
+  .pager-btn.next{text-align:right;background:var(--navy);color:#fff;}
+  .pager-btn.next:hover{background:var(--navy-2);}
+  .pager-btn:disabled{opacity:.35;cursor:default;}
+  .pager-btn:disabled:hover{background:transparent;color:var(--navy);}
+
+  /* ---- Ficha de Situación ---- */
+  .ficha-wrap{max-width:640px;margin:0 auto;padding:56px 24px 100px;}
+  .ficha-card{background:#fff;border:1px solid var(--line);border-radius:6px;padding:38px 36px;}
+  .ficha-lede{font-family:var(--serif);font-size:16px;color:var(--ink-soft);line-height:1.7;margin:10px 0 30px;}
+  .field{margin-bottom:22px;}
+  .field-label{display:block;font-family:var(--display);font-weight:700;font-size:13px;color:var(--navy);
+    margin-bottom:9px;}
+  .field-hint{font-family:var(--mono);font-size:10.5px;color:var(--slate);margin:-6px 0 9px;}
+  .field input[type=text], .field textarea{
+    width:100%;padding:11px 13px;border:1px solid var(--line);border-radius:3px;
+    font-family:var(--serif);font-size:15px;color:var(--ink);background:var(--paper);
+  }
+  .field input[type=text]:focus, .field textarea:focus{outline:none;border-color:var(--gold);}
+  .field textarea{min-height:70px;resize:vertical;}
+  .chip-group{display:flex;flex-wrap:wrap;gap:8px;}
+  .chip{
+    padding:8px 14px;border:1px solid var(--line);border-radius:20px;background:var(--paper);
+    font-family:var(--mono);font-size:12px;color:var(--ink-soft);cursor:pointer;user-select:none;
+  }
+  .chip:hover{border-color:var(--gold);}
+  .chip.selected{background:var(--navy);border-color:var(--navy);color:var(--gold-soft);}
+  .ficha-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:8px;}
+  .ficha-actions .btn-gold{width:auto;padding:13px 30px;}
+  .ficha-skip{background:none;border:none;font-family:var(--mono);font-size:11.5px;color:var(--slate);
+    text-decoration:underline;padding:13px 6px;}
+
+  /* ---- Welcome / phase overview screens ---- */
+  .welcome{max-width:640px;margin:0 auto;padding:70px 24px 100px;text-align:center;}
+  .welcome .brand-eyebrow{justify-content:center;}
+  .welcome h1{font-family:var(--display);font-weight:800;font-size:34px;color:var(--navy);
+    margin:14px 0 18px;line-height:1.18;}
+  .welcome p{font-family:var(--serif);font-size:17px;color:var(--ink-soft);line-height:1.75;margin-bottom:14px;}
+  .welcome .btn-gold{width:auto;padding:14px 34px;margin-top:20px;display:inline-block;}
+  .journey{display:flex;flex-direction:column;gap:0;margin:44px 0;text-align:left;}
+  .journey-row{display:flex;align-items:center;gap:16px;padding:14px 0;border-bottom:1px solid var(--line);}
+  .journey-num{font-family:var(--mono);font-size:11px;color:var(--gold);width:52px;flex-shrink:0;}
+  .journey-name{font-family:var(--display);font-weight:700;font-size:13.5px;color:var(--navy);flex:1;}
+  .journey-state{font-family:var(--mono);font-size:10px;color:var(--locked);}
+  .journey-row.active .journey-state{color:var(--success);}
+
+  /* ===================== MENTOR IA DRAWER ===================== */
+  #mentorDrawer{
+    position:fixed;top:0;right:-420px;width:400px;max-width:92vw;height:100vh;background:var(--navy);
+    z-index:50;transition:right .3s ease;box-shadow:-8px 0 30px rgba(0,0,0,0.4);
+    display:flex;flex-direction:column;border-left:1px solid rgba(201,162,39,0.3);
+  }
+  #mentorDrawer.open{right:0;}
+  .mentor-head{padding:20px 22px;border-bottom:1px solid rgba(255,255,255,0.08);
+    display:flex;align-items:center;justify-content:space-between;}
+  .mentor-head-title{font-family:var(--display);font-weight:800;color:#fff;font-size:15px;}
+  .mentor-head-sub{font-family:var(--mono);font-size:10px;color:var(--gold-soft);margin-top:3px;}
+  .mentor-close{background:none;border:none;color:#8794AC;font-size:20px;line-height:1;}
+  .mentor-close:hover{color:#fff;}
+  .mentor-body{flex:1;overflow-y:auto;padding:20px 22px;display:flex;flex-direction:column;gap:14px;}
+  .mbubble{max-width:88%;font-family:var(--serif);font-size:14.5px;line-height:1.6;padding:12px 15px;border-radius:6px;}
+  .mbubble.user{align-self:flex-end;background:var(--gold);color:var(--navy);border-radius:6px 6px 0 6px;}
+  .mbubble.mentor{align-self:flex-start;background:#152442;color:#E7EAF2;border-radius:6px 6px 6px 0;}
+  .mbubble.system{align-self:center;font-family:var(--mono);font-size:10.5px;color:#6B7A99;text-align:center;background:none;}
+  .mentor-typing{align-self:flex-start;font-family:var(--mono);font-size:11px;color:#6B7A99;}
+  .mentor-input-row{padding:16px 18px;border-top:1px solid rgba(255,255,255,0.08);display:flex;gap:8px;}
+  .mentor-input-row textarea{
+    flex:1;background:#0D1930;border:1px solid #2A3A57;border-radius:4px;color:#fff;
+    font-family:var(--serif);font-size:14px;padding:10px 12px;resize:none;min-height:44px;max-height:120px;
+  }
+  .mentor-input-row textarea:focus{outline:none;border-color:var(--gold);}
+  .mentor-send{background:var(--gold);border:none;border-radius:4px;padding:0 16px;color:var(--navy);font-weight:700;font-size:13px;}
+  .mentor-send:hover{background:var(--gold-soft);}
+  .mentor-send:disabled{opacity:.4;}
+  .mentor-quota{font-family:var(--mono);font-size:10px;color:#6B7A99;padding:0 22px 14px;}
+  #mentorScrim{position:fixed;inset:0;background:rgba(0,0,0,0.35);z-index:40;display:none;}
+  #mentorScrim.open{display:block;}
+
+  @media print{
+    #gate,.sidebar,.topbar,.nav-pagers,#mentorDrawer,#mentorScrim,.mentor-toggle{display:none !important;}
+    .shell{display:block;}
+    body{background:#fff;}
+    .main{background:#fff;}
+  }
+
+  .demo-banner{
+    background:linear-gradient(90deg, var(--navy), var(--navy-2));
+    color:#EDE6D2;text-align:center;padding:10px 16px;font-family:var(--mono);font-size:11px;
+    letter-spacing:.05em;border-bottom:2px solid var(--gold);
+  }
+  .demo-banner a{color:var(--gold-soft);text-decoration:underline;}
+  .cta-unlock{
+    display:block;width:100%;text-align:center;padding:11px;background:var(--gold);color:var(--navy);
+    border-radius:3px;font-family:var(--mono);font-weight:700;font-size:11.5px;letter-spacing:.03em;
+    text-decoration:none;margin-top:6px;
+  }
+  .cta-unlock:hover{background:var(--gold-soft);}
+</style>
+</head>
+<body>
+
+<div class="demo-banner">🎁 DEMO GRATUITA — Fase I completa (4 sesiones) + 3 consultas al Mentor IA · <a href="https://seralcalde.es" target="_blank">Ver versión completa</a></div>
+
+<div id="app">
+  <div class="shell">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="sb-brand">
+        <div class="sb-mark">SA</div>
+        <div>
+          <div class="sb-name">Mentor SerAlcalde®</div>
+        </div>
+      </div>
+      <div class="sb-tag">Demo Gratuita · Preparación integral para una candidatura municipal</div>
+
+      <div class="progress-block">
+        <div class="progress-label"><span>Tu progreso</span><span id="progressPct">0%</span></div>
+        <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+      </div>
+
+      <div id="phaseNav"></div>
+
+      <div class="sb-footer">
+        <div class="sb-license">Acceso: <b>Demo gratuita</b></div>
+        <button class="mentor-toggle" onclick="goTo('ficha')" style="margin-bottom:10px;">✎ Mi ficha de situación</button>
+        <button class="mentor-toggle" onclick="goTo('book')" style="margin-bottom:10px;">📘 Mi Libro Estratégico</button>
+        <button class="mentor-toggle" onclick="openMentor()" style="margin-bottom:10px;">✦ Consultar al Mentor IA</button>
+        <a class="cta-unlock" href="https://seralcalde.es" target="_blank">🔓 Desbloquear versión completa</a>
+      </div>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="main">
+      <div class="topbar">
+        <div class="topbar-crumb" id="crumb">Bienvenida</div>
+        <button class="export-btn" onclick="window.print()">Exportar mi progreso (PDF)</button>
+      </div>
+      <div id="pageContent"></div>
+    </main>
+
+  </div>
+</div>
+
+<!-- ===================== MENTOR DRAWER ===================== -->
+<div id="mentorScrim" onclick="closeMentor()"></div>
+<div id="mentorDrawer">
+  <div class="mentor-head">
+    <div>
+      <div class="mentor-head-title">Mentor IA · SerAlcalde</div>
+      <div class="mentor-head-sub" id="mentorContext">Sesión actual</div>
+    </div>
+    <button class="mentor-close" onclick="closeMentor()">×</button>
+  </div>
+  <div class="mentor-body" id="mentorBody"></div>
+  <div class="mentor-quota" id="mentorQuota"></div>
+  <div class="mentor-input-row">
+    <textarea id="mentorInput" placeholder="Escribe tu pregunta o duda sobre esta sesión..." onkeydown="mentorKeydown(event)"></textarea>
+    <button class="mentor-send" id="mentorSendBtn" onclick="sendMentor()">Enviar</button>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script>
+const PHASES = [
+  { id:'f1', num:'FASE I', name:'Decidir', locked:false, sessions:[
+    { id:'s1', num:1, title:'Decidir', builtin:true },
+    { id:'s2', num:2, title:'Analizar la oportunidad', builtin:true },
+    { id:'s3', num:3, title:'Imaginar el municipio', builtin:true },
+    { id:'s4', num:4, title:'Definir los valores', builtin:true },
+  ]},
+  { id:'f2', num:'FASE II', name:'Construir el equipo', locked:true, sessions:[
+    {num:5,title:'Reunir al grupo impulsor'},{num:6,title:'Incorporar personas comprometidas'},
+    {num:7,title:'Organizar el equipo'}
+  ]},
+  { id:'f3', num:'FASE III', name:'Construir el proyecto', locked:true, sessions:[
+    {num:8,title:'Crear un movimiento ciudadano'},{num:9,title:'Escuchar antes de proponer'},
+    {num:10,title:'Diagnosticar la realidad'},{num:11,title:'Diseñar el proyecto de municipio'},
+    {num:12,title:'Priorizar las propuestas'}
+  ]},
+  { id:'f4', num:'FASE IV', name:'Preparar la candidatura', locked:true, sessions:[
+    {num:13,title:'Constituir la candidatura'},{num:14,title:'Construir la identidad'}
+  ]},
+  { id:'f5', num:'FASE V', name:'Llegar a los vecinos', locked:true, sessions:[
+    {num:15,title:'Organizar la campaña'},{num:16,title:'Definir el mensaje'},
+    {num:17,title:'Conversar con los vecinos'},{num:18,title:'Crear comunidad'},
+    {num:19,title:'Comunicar con coherencia'}
+  ]},
+  { id:'f6', num:'FASE VI', name:'Las elecciones', locked:true, sessions:[
+    {num:20,title:'Preparar la jornada electoral'}
+  ]},
+  { id:'f7', num:'FASE VII', name:'El liderazgo que permanece', locked:true, sessions:[
+    {num:21,title:'Servir al municipio después de las elecciones'},
+    {num:22,title:'Gobernar con propósito'},{num:23,title:'Los primeros 100 días'},
+    {num:24,title:'Liderar también a quienes no te votaron'},
+    {num:25,title:'Tomar decisiones difíciles'},{num:26,title:'Afrontar crisis, errores y conflictos'},
+    {num:27,title:'Medir, rendir cuentas y corregir el rumbo'},{num:28,title:'El compromiso que permanece'}
+  ]},
+];
+
+/* Full content for Fase I sessions (demo gratuita) */
+const SESSIONS = {
+  s1:{
+    num:1, piece:'compromiso', phase:'FASE I · DECIDIR', title:'Decidir',
+    subtitle:'¿Por qué quiero dar el paso y aspirar a ser alcalde?',
+    quote:'“Las mejores candidaturas no nacen solo para ganar unas elecciones. Nacen cuando alguien decide que su municipio merece algo mejor y está dispuesto a trabajar para conseguirlo.”',
+    body:`
+      <p><strong>Toda candidatura comienza mucho antes</strong> de recoger firmas, diseñar un logotipo o preparar una campaña. Comienza el día en que alguien deja de preguntarse «¿por qué nadie hace nada?» y empieza a preguntarse «¿y si empezáramos nosotros?».</p>
+      <p>Esta primera sesión no pretende enseñarte política. Pretende ayudarte a responder una única pregunta: ¿estoy dispuesto a asumir la responsabilidad de intentar mejorar mi municipio? Porque aspirar a ser alcalde no consiste en enfrentarse a otros. Consiste en prepararse para ponerse al servicio de todos los vecinos.</p>
+      <div class="section-h">Lo primero que debes saber</div>
+      <p>La inmensa mayoría de las personas que podrían ser excelentes alcaldes nunca llegan a presentarse: creen que la política pertenece a los partidos, que no tienen experiencia suficiente, que necesitan grandes recursos o que temen las críticas. Sin embargo, muchas de las mejores transformaciones locales comenzaron cuando un grupo de vecinos —no políticos profesionales, sino ciudadanos comprometidos— decidió dar un paso adelante.</p>
+      <div class="section-h">El municipio por encima de las siglas</div>
+      <p>Te presentes desde una candidatura independiente, una agrupación de electores, un partido local o una formación política, hay un principio que debe permanecer intacto: el municipio está por encima de las siglas. Quien aspira a ser alcalde debe aprender a preguntarse siempre «¿qué necesita mi municipio?» antes que «¿qué conviene a mi organización?».</p>
+      <div class="section-h">El verdadero origen de una candidatura</div>
+      <p>Las candidaturas con vocación municipal rara vez deberían nacer únicamente alrededor de una persona. Normalmente nacen alrededor de un problema: una playa abandonada, un casco histórico deteriorado, una juventud que se marcha, una administración que deja de escuchar. Poco a poco distintas conversaciones empiezan a repetirse, hasta que un día alguien formula la pregunta decisiva: ¿y si lo intentáramos nosotros? Ese es el verdadero nacimiento de un movimiento ciudadano.</p>
+      <div class="section-h">Del enfado al proyecto</div>
+      <p>El enfado nunca gana unas elecciones. Puede llamar la atención y movilizar durante unas semanas, pero no construye confianza. Lo que convence a un pueblo es la esperanza. Por eso una candidatura municipal debe transformar la crítica en propuesta, la queja en solución, el enfado en ilusión. No basta con demostrar que algo funciona mal: hay que demostrar que existe una forma mejor de hacerlo.</p>
+      <div class="section-h">Las cinco preguntas que debes responder</div>
+      <p>Antes de continuar este programa, responde con absoluta sinceridad:</p>
+      <ul>
+        <li><strong>1. ¿Por qué quiero presentarme?</strong> No existen respuestas perfectas, pero sí respuestas honestas.</li>
+        <li><strong>2. ¿Estoy dispuesto a escuchar incluso a quien no piensa como yo?</strong> Un alcalde representa a todo el municipio, no solo a quienes le votan.</li>
+        <li><strong>3. ¿Estoy dispuesto a dedicar varios años de mi vida?</strong> Una campaña dura meses; gobernar puede ocupar ocho años.</li>
+        <li><strong>4. ¿Acepto la crítica?</strong> Las críticas llegarán desde todos los lados. La cuestión no es evitarlas, es aprender a convivir con ellas.</li>
+        <li><strong>5. ¿Lo haría aunque nadie me garantizara ganar?</strong> Quien solo quiere ganar unas elecciones termina decepcionándose. Quien quiere mejorar su pueblo ya ha empezado a transformar la realidad desde el primer día.</li>
+      </ul>
+    `,
+    exercises:[
+      { id:'compromiso', label:'Documento fundacional', title:'El compromiso personal del candidato',
+        prompt:'Empieza con la frase «He decidido iniciar este camino porque...» y continúa libremente: qué te preocupa de tu municipio, qué sueñas para él, qué estás dispuesto a aportar, qué límites éticos nunca cruzarás y qué tipo de alcalde deseas llegar a ser. No será público, pero será el documento más importante de todo el programa. Volverás a leerlo al finalizar la última sesión.' },
+      { id:'punto_partida', label:'Ejercicio práctico', title:'Mi punto de partida',
+        prompt:'Completa: Lo que más me preocupa de mi municipio es... / Lo que más valoro de mi municipio es... / Si pudiera cambiar una sola cosa sería... / Creo que los vecinos necesitan... / Dentro de ocho años me gustaría que mi municipio fuera reconocido por... / Si no me presentara, dentro de diez años me arrepentiría porque... No busques respuestas brillantes. Busca respuestas verdaderas.' },
+    ],
+    checklist:[
+      'He identificado mis verdaderas motivaciones.',
+      'Tengo claro qué significa poner el municipio por encima de las siglas.',
+      'Distingo entre reaccionar por enfado y liderar con un proyecto.',
+      'He respondido con honestidad a las cinco preguntas clave.',
+      'He redactado mi compromiso personal.',
+      'He realizado el ejercicio "Mi punto de partida".',
+    ],
+    idea:'Las buenas candidaturas no nacen para ocupar el Ayuntamiento. Nacen para poner el Ayuntamiento al servicio de sus vecinos.',
+    frase:'“Un partido busca representantes. Un movimiento ciudadano busca servidores públicos. Antes de ser candidato, decide qué clase de servidor quieres llegar a ser.”',
+    advance:'En la siguiente sesión daremos el siguiente paso: analizarás objetivamente tu municipio para responder a una pregunta decisiva: ¿existe realmente espacio para una candidatura capaz de ganar la confianza de los vecinos?'
+  },
+
+  s2:{
+    num:2, piece:'siete_dim', phase:'FASE I · DECIDIR', title:'Analizar la oportunidad',
+    subtitle:'¿Existe espacio para una candidatura capaz de generar confianza?',
+    quote:'“No gana quien más desea ser alcalde. Gana quien mejor entiende su municipio.”',
+    body:`
+      <p>La ilusión es imprescindible, pero no basta. Muchos proyectos ciudadanos fracasan porque nacen únicamente desde el entusiasmo y no desde el conocimiento de la realidad. Antes de hablar de programas, campañas o listas electorales, necesitamos responder una pregunta decisiva: ¿existe realmente una oportunidad para que tu candidatura obtenga la confianza de los vecinos?</p>
+      <div class="section-h">El primer error que cometen muchas candidaturas</div>
+      <p>Muchas personas creen que una candidatura alternativa nace porque el alcalde lo está haciendo mal. Eso es un error: una mala gestión no garantiza una alternativa, del mismo modo que un buen gobierno no impide que aparezcan nuevos proyectos. Las candidaturas sólidas no crecen solo sobre el descontento. Crecen sobre la confianza. La verdadera pregunta no es «¿la gente está enfadada?», sino «¿la gente está dispuesta a confiar en un proyecto nuevo?».</p>
+      <div class="section-h">Cambia la pregunta</div>
+      <p>En lugar de preguntarte «¿podemos ganar?», empieza preguntándote «¿qué necesita realmente este municipio?». Una candidatura no existe para ocupar un espacio político. Existe para resolver problemas. Cuando esa idea cambia, cambia también la forma de escuchar.</p>
+      <div class="section-h">Comprender el municipio</div>
+      <p>Cada pueblo tiene una personalidad propia: industrial, turístico, agrícola, residencial, universitario, en expansión, en declive, con fuerte identidad histórica, con gran población flotante. Todos requieren respuestas diferentes. Antes de proponer soluciones debes comprender el sistema completo.</p>
+      <div class="section-h">Las siete dimensiones del municipio</div>
+      <p>Analiza tu municipio desde siete perspectivas: <strong>1. Las personas</strong> (¿quién vive aquí?, ¿crece o envejece la población?, ¿qué preocupa a las familias?); <strong>2. La economía</strong> (¿de qué vive el municipio?); <strong>3. El territorio y los servicios</strong>; <strong>4. La vida social y asociativa</strong>; <strong>5. La gestión municipal actual</strong>; <strong>6. El clima político y electoral</strong>; y <strong>7. La identidad y el relato colectivo</strong> del municipio. Cada dimensión te ofrece piezas del mismo rompecabezas: cuanto mejor comprendas tu municipio, con más solidez podrás construir tu proyecto.</p>
+    `,
+    exercises:[
+      { id:'siete_dim', label:'Ejercicio práctico', title:'Mi municipio en siete dimensiones',
+        prompt:'Escribe dos o tres frases honestas sobre cada una de las siete dimensiones de tu municipio: las personas, la economía, el territorio y los servicios, la vida social, la gestión municipal actual, el clima político y la identidad colectiva. No busques quedar bien: busca comprender.' },
+      { id:'oportunidad', label:'Ejercicio práctico', title:'¿Existe la oportunidad?',
+        prompt:'Responde con sinceridad: ¿qué necesidad real detectas que hoy no está bien atendida? ¿Qué conversaciones se repiten entre tus vecinos? ¿Qué evidencias tienes de que existe espacio de confianza para un proyecto nuevo, más allá de tu propio entusiasmo?' },
+    ],
+    checklist:[
+      'Distingo entre descontento y oportunidad real de confianza.',
+      'He cambiado la pregunta de "¿podemos ganar?" a "¿qué necesita el municipio?".',
+      'He analizado mi municipio desde las siete dimensiones.',
+      'He identificado necesidades reales, no solo intuiciones.',
+      'He completado el ejercicio "Mi municipio en siete dimensiones".',
+    ],
+    idea:'Una candidatura sólida no se construye sobre el enfado del momento, sino sobre el conocimiento profundo y honesto del municipio.',
+    frase:'“No gana quien más desea ser alcalde. Gana quien mejor entiende su municipio.”',
+    advance:'En la próxima sesión darás un paso decisivo: dejarás de mirar los problemas del presente para empezar a imaginar, con claridad, el municipio que quieres ayudar a construir.'
+  },
+
+  s3:{
+    num:3, piece:'declaracion_futuro', phase:'FASE I · DECIDIR', title:'Imaginar el municipio',
+    subtitle:'La visión del municipio que queremos construir',
+    quote:'“Las elecciones no las gana quien mejor describe los problemas. Las gana quien mejor explica el futuro.”',
+    body:`
+      <p>Después de escuchar a los vecinos y comprender la realidad del municipio, llega el momento de hacerte una pregunta mucho más importante: ¿qué municipio quiero ayudar a construir? Muchos candidatos dedican meses a elaborar cientos de propuestas. Muy pocos dedican un solo día a imaginar con claridad el municipio que quieren dejar como legado. Sin embargo, toda buena gestión comienza precisamente ahí: no con un presupuesto, ni con un plan urbanístico, sino con una visión.</p>
+      <div class="section-h">El alcalde no solo administra</div>
+      <p>Existe una enorme diferencia entre administrar un municipio y liderarlo. Administrar consiste en resolver los problemas del presente. Liderar consiste en preparar el futuro. Un buen gestor consigue que el Ayuntamiento funcione; un gran alcalde consigue que el municipio avance. Ningún barco llega a buen puerto si antes no ha decidido cuál es su destino.</p>
+      <div class="section-h">Los cuatro pilares de una visión transformadora</div>
+      <p>Toda visión sólida suele apoyarse en cuatro grandes ideas: <strong>1. Un municipio donde sea agradable vivir</strong> —no solo por sus infraestructuras, también por la convivencia, la limpieza, la seguridad y la belleza—; <strong>2. Un municipio donde existan oportunidades</strong> —los jóvenes encuentran empleo, los emprendedores reciben apoyo, el talento no necesita marcharse—; <strong>3. Un municipio que cuide de las personas</strong> —infancia, mayores, dependientes, nadie debería sentirse invisible—; y <strong>4. Un municipio orgulloso de sí mismo</strong> —su patrimonio, su cultura, su identidad—. Un pueblo con autoestima genera ciudadanos comprometidos.</p>
+      <div class="section-h">No prometas proyectos. Propón un destino.</div>
+      <p>Uno de los mayores errores de muchas campañas es presentar listas interminables de actuaciones: cincuenta propuestas, cien compromisos. Los vecinos las olvidan. En cambio, nunca olvidan una visión clara. No recordamos todas las actuaciones que realizó una ciudad admirada: recordamos lo que consiguió llegar a ser.</p>
+      <div class="section-h">El error del "anti"</div>
+      <p>Muchas candidaturas nacen definiéndose por oposición: «no somos como ellos», «no repetiremos sus errores». Eso puede explicar el pasado, pero nunca construirá el futuro. Las personas no siguen a quien mejor critica. Siguen a quien mejor propone.</p>
+      <div class="section-h">La visión debe ser compartida</div>
+      <p>Un buen candidato no impone un sueño: lo construye con sus vecinos. La visión nace de cientos de conversaciones, de escuchar, de descubrir aquello que la mayoría desea aunque nunca lo haya expresado con claridad. Cuando una visión pertenece a todos, deja de ser un discurso electoral y se convierte en un proyecto colectivo.</p>
+    `,
+    exercises:[
+      { id:'declaracion_futuro', label:'Documento fundacional', title:'Tu primera declaración de futuro',
+        prompt:'Escribe, en no más de una página, tu primera visión de candidatura. Empieza con «Imagino un municipio donde...» y describe vidas, no obras: cómo vivirán las personas, cómo se relacionarán, cómo trabajarán, cómo participarán. Cuando termines, léelo en voz alta: si tú mismo no te emocionas, probablemente tampoco emocione a los demás.' },
+      { id:'portada_periodico', label:'Ejercicio práctico', title:'La portada del periódico dentro de diez años',
+        prompt:'Imagina que el periódico local publica un suplemento especial titulado «Diez años que transformaron nuestro municipio». Redacta esa noticia: qué ha cambiado, qué decisiones fueron decisivas, qué opinan los vecinos, qué legado deja ese periodo. No escribas un programa electoral: escribe una historia.' },
+    ],
+    checklist:[
+      'Distingo entre gestionar el presente y liderar el futuro.',
+      'He definido una visión inspiradora para mi municipio.',
+      'Mi visión habla de personas, no solo de infraestructuras.',
+      'Evito construir mi proyecto desde la crítica.',
+      'He redactado mi primera Declaración de Futuro.',
+    ],
+    idea:'Los vecinos no votan únicamente a quien promete resolver problemas. Votan a quien les ayuda a imaginar un futuro mejor y les convence de que merece la pena construirlo juntos.',
+    frase:'“Los programas responden a la pregunta ‘¿qué vamos a hacer?’. La visión responde a una pregunta mucho más poderosa: ‘¿en qué municipio queremos convertirnos?’”',
+    advance:'En la próxima sesión transformarás esa visión en la identidad de tu movimiento ciudadano: los principios que nunca negociarás y el compromiso ético que inspirará la confianza de los vecinos.'
+  },
+
+  s4:{
+    num:4, piece:'carta_identidad', phase:'FASE I · DECIDIR', title:'Definir los valores',
+    subtitle:'La confianza es el primer programa electoral',
+    quote:'“Los vecinos pueden perdonar un error. Lo que nunca perdonan es sentirse engañados.”',
+    body:`
+      <p>Ya has descubierto por qué quieres presentarte, has aprendido a escuchar tu municipio y has comenzado a imaginar el futuro que deseas construir. Ahora llega una pregunta mucho más exigente: ¿qué clase de personas vais a ser? Porque una candidatura municipal no se diferencia únicamente por sus propuestas. Se diferencia, sobre todo, por su manera de hacer política. Los programas cambian, las circunstancias cambian, los gobiernos cambian. Pero los valores permanecen.</p>
+      <div class="section-h">Antes que un programa existe un carácter</div>
+      <p>Un programa electoral puede escribirse en pocas semanas; un equipo puede organizarse en unos meses. La confianza necesita años, y puede perderse en un solo minuto. Gobernar desde los valores no significa ser perfecto: significa disponer de criterios claros para decidir cuando aparecen los conflictos, cuando hay que elegir entre lo fácil o lo correcto, lo popular o lo necesario, lo conveniente para unos pocos o lo beneficioso para la mayoría.</p>
+      <div class="section-h">Los diez valores de un movimiento ciudadano</div>
+      <p>Cada candidatura deberá redactar los suyos, pero toda organización que aspire a generar confianza debería reflexionar, al menos, sobre estos diez principios:</p>
+      <ul>
+        <li><strong>Servicio</strong> — el Ayuntamiento no pertenece al alcalde, pertenece al municipio.</li>
+        <li><strong>Honestidad</strong> — diremos la verdad incluso cuando no resulte cómoda.</li>
+        <li><strong>Cercanía</strong> — la cercanía no consiste en hacerse fotografías, consiste en estar disponible.</li>
+        <li><strong>Respeto</strong> — la discrepancia forma parte de la democracia; la descalificación permanente la destruye.</li>
+        <li><strong>Transparencia</strong> — explicaremos las decisiones y reconoceremos los errores.</li>
+        <li><strong>Competencia</strong> — la buena voluntad nunca sustituye a la preparación.</li>
+        <li><strong>Participación</strong> — gobernaremos con la ciudadanía, no únicamente para ella.</li>
+        <li><strong>Responsabilidad</strong> — cada decisión tendrá consecuencias, y las asumiremos.</li>
+        <li><strong>Cooperación</strong> — el interés general estará por encima de cualquier protagonismo.</li>
+        <li><strong>Ejemplaridad</strong> — los vecinos observan mucho más lo que hace un alcalde que lo que dice.</li>
+      </ul>
+      <div class="section-h">La política también se contagia</div>
+      <p>Los equipos terminan pareciéndose a quienes los lideran. Si el candidato escucha, el equipo aprenderá a escuchar. Si el candidato busca acuerdos, el movimiento aprenderá a cooperar. La cultura siempre desciende desde el liderazgo.</p>
+      <div class="section-h">El verdadero patrimonio del movimiento</div>
+      <p>Muchas candidaturas desaparecen después de una legislatura porque fueron creadas únicamente para ganar unas elecciones: no construyeron una cultura, no formaron nuevos líderes. Cuando un movimiento desarrolla valores sólidos, trasciende a las personas. Las personas cambian; los principios permanecen.</p>
+    `,
+    exercises:[
+      { id:'cinco_compromisos', label:'Ejercicio práctico', title:'Los cinco compromisos irrenunciables',
+        prompt:'Completa cinco veces la frase «Pase lo que pase, nunca renunciaremos a...» (por ejemplo: escuchar antes de decidir, explicar nuestras decisiones, respetar a quien piensa distinto). Cuando todo se complique —y se complicará— este documento os recordará quiénes decidisteis ser.' },
+      { id:'carta_identidad', label:'Documento fundacional', title:'La Carta de Identidad del Movimiento',
+        prompt:'Redacta un documento breve que responda a: ¿quiénes somos?, ¿por qué hemos nacido?, ¿qué defendemos?, ¿cómo queremos hacer política?, ¿qué nunca estaremos dispuestos a hacer? No es un manifiesto electoral: es vuestra identidad. Cada nuevo miembro del equipo debería leerla antes de incorporarse.' },
+    ],
+    checklist:[
+      'Comprendo que la confianza es el principal activo de cualquier candidatura municipal.',
+      'He identificado los valores que definirán nuestro movimiento.',
+      'Distingo entre un programa electoral y una cultura de gobierno.',
+      'He definido cinco compromisos irrenunciables.',
+      'He comenzado la Carta de Identidad del Movimiento.',
+    ],
+    idea:'Los vecinos pueden tardar meses en conocer tus propuestas, pero descubrirán tus valores en los primeros minutos de conversación. La confianza no se promete; se demuestra.',
+    frase:'“Las elecciones pueden ganarse con una buena campaña. El respeto de un pueblo solo se gana viviendo de acuerdo con los valores que uno proclama.”',
+    advance:'Con esta sesión concluye la Fase I: has construido un propósito personal, un conocimiento profundo del municipio, una visión compartida de futuro y unos valores irrenunciables. Solo ahora tiene sentido iniciar la Fase II, en la que empezarás a reunir al grupo impulsor de tu candidatura.'
+  },
+};
+
+const SESSION_ORDER = ['s1','s2','s3','s4'];
+
+function findPhaseForSession(sid){
+  for(const phase of PHASES){
+    const found = phase.sessions.find(s=>s.id===sid);
+    if(found) return { phase, list: phase.sessions };
+  }
+  return null;
+}
+
+/* ============================================================
+   FICHA DE SITUACIÓN
+   ============================================================ */
+const FICHA_FIELDS = {
+  habitantes: ["Menos de 1.000","Entre 1.000 y 5.000","Entre 5.000 y 20.000","Entre 20.000 y 50.000","Más de 50.000"],
+  experiencia: ["Estoy pensando en presentarme","Estaré en la lista","Estoy asesorando una candidatura","Nunca he sido concejal/a","He sido concejal/a","He sido alcalde/alcaldesa","He ocupado otro cargo público"],
+  tiempo: ["Menos de 5h/semana","Entre 5 y 15h/semana","Más de 15h/semana","Dedicación completa"],
+  recursos: ["Redes sociales activas","Local o sede","Contactos con medios locales","Experiencia en comunicación","Apoyo de una asociación o colectivo","Ninguno de momento"],
+  momento: ["Estoy explorando la posibilidad","Ya he decidido dar el paso","Estaré en una lista electoral","Estoy asesorando a una candidatura","Ya tengo un equipo o grupo impulsor","Ya existe una candidatura organizada","Ya participé en una candidatura anterior"],
+};
+const DEFAULT_PROFILE = {
+  nombre:'', municipio:'', habitantes:'', experiencia:'', candidatura:'', profesion:'',
+  equipo:'', tiempo:'', presupuesto:'', recursos:[], momento:'', motivacion:''
+};
+
+/* ============================================================
+   STATE
+   ============================================================ */
+let STATE = { license:null, tier:'demo', currentSession:'welcome', mentorMsgCount:0, mentorHistory:[], profile:Object.assign({}, DEFAULT_PROFILE), fichaDone:false };
+const STORE_KEY = 'seralcalde_vsa_state_v1';
+
+function loadState(){
+  try{
+    const raw = localStorage.getItem(STORE_KEY);
+    if(raw) STATE = Object.assign(STATE, JSON.parse(raw));
+  }catch(e){}
+}
+function saveState(){
+  try{ localStorage.setItem(STORE_KEY, JSON.stringify(STATE)); }catch(e){}
+}
+function getAnswer(sid, exId){
+  const raw = localStorage.getItem('ans_'+sid+'_'+exId);
+  return raw || '';
+}
+function setAnswer(sid, exId, val){
+  localStorage.setItem('ans_'+sid+'_'+exId, val);
+}
+function getCheck(sid, idx){
+  return localStorage.getItem('chk_'+sid+'_'+idx) === '1';
+}
+function setCheck(sid, idx, val){
+  localStorage.setItem('chk_'+sid+'_'+idx, val ? '1' : '0');
+}
+function sessionCompletion(sid){
+  const s = SESSIONS[sid]; if(!s) return 0;
+  let total = s.checklist.length, done = 0;
+  s.checklist.forEach((_,i)=>{ if(getCheck(sid,i)) done++; });
+  return total ? done/total : 0;
+}
+function sessionDone(sid){ return sessionCompletion(sid) === 1; }
+
+/* ============================================================
+   PDF ATTACHMENTS FOR EXERCISES
+   ============================================================ */
+
+if(typeof pdfjsLib !== 'undefined'){
+  pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+}
+const PDF_MAX_MB = 20;
+const PDF_MAX_PAGES = 40;
+const PDF_MAX_CHARS_STORED = 12000;
+
+function pdfKey(sid, exId){ return 'pdf_'+sid+'_'+exId; }
+function getPdfAttachment(sid, exId){
+  try{
+    const raw = localStorage.getItem(pdfKey(sid, exId));
+    return raw ? JSON.parse(raw) : null;
+  }catch(e){ return null; }
+}
+function setPdfAttachment(sid, exId, filename, text){
+  try{ localStorage.setItem(pdfKey(sid, exId), JSON.stringify({filename, text})); }catch(e){}
+}
+function removePdfAttachment(sid, exId){
+  localStorage.removeItem(pdfKey(sid, exId));
+}
+function removePdf(sid, exId){
+  removePdfAttachment(sid, exId);
+  renderPdfStatus(sid, exId);
+}
+function renderPdfStatus(sid, exId){
+  const el = document.getElementById('pdfstatus_'+exId);
+  if(!el) return;
+  el.className = 'pdf-status';
+  const att = getPdfAttachment(sid, exId);
+  if(att){
+    el.innerHTML = `<span class="pdf-chip">📄 ${escapeHtml(att.filename)} <button type="button" onclick="removePdf('${sid}','${exId}')" title="Quitar PDF">×</button></span>`;
+  } else {
+    el.innerHTML = '';
+  }
+}
+async function handlePdfUpload(sid, exId, inputEl){
+  const file = inputEl.files && inputEl.files[0];
+  if(!file) return;
+  const statusEl = document.getElementById('pdfstatus_'+exId);
+  if(file.type !== 'application/pdf'){
+    statusEl.className = 'pdf-status error';
+    statusEl.textContent = 'Ese archivo no es un PDF.';
+    inputEl.value = '';
+    return;
+  }
+  if(file.size > PDF_MAX_MB * 1024 * 1024){
+    statusEl.className = 'pdf-status error';
+    statusEl.textContent = `El PDF pesa demasiado (máx. ${PDF_MAX_MB}MB).`;
+    inputEl.value = '';
+    return;
+  }
+  statusEl.className = 'pdf-status loading';
+  statusEl.textContent = 'Leyendo el PDF...';
+  try{
+    if(typeof pdfjsLib === 'undefined'){
+      throw new Error('pdfjs not loaded');
+    }
+    const arrayBuffer = await file.arrayBuffer();
+    const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+    let text = '';
+    const pagesToRead = Math.min(pdf.numPages, PDF_MAX_PAGES);
+    for(let i = 1; i <= pagesToRead; i++){
+      const page = await pdf.getPage(i);
+      const content = await page.getTextContent();
+      text += content.items.map(it => it.str).join(' ') + '\n\n';
+    }
+    text = text.trim();
+    if(!text){
+      statusEl.className = 'pdf-status error';
+      statusEl.textContent = 'No se pudo extraer texto (¿es un PDF escaneado sin texto?).';
+      inputEl.value = '';
+      return;
+    }
+    if(pdf.numPages > PDF_MAX_PAGES){
+      text += `\n\n[Documento de ${pdf.numPages} páginas; se han leído las primeras ${PDF_MAX_PAGES}.]`;
+    }
+    if(text.length > PDF_MAX_CHARS_STORED){
+      text = text.slice(0, PDF_MAX_CHARS_STORED) + '\n\n[...contenido truncado...]';
+    }
+    setPdfAttachment(sid, exId, file.name, text);
+    renderPdfStatus(sid, exId);
+  }catch(err){
+    statusEl.className = 'pdf-status error';
+    statusEl.textContent = 'No se pudo leer este PDF. Prueba con otro archivo.';
+  }
+  inputEl.value = '';
+}
+
+/* ============================================================
+   IMAGE ATTACHMENTS FOR EXERCISES
+   ============================================================ */
+const IMG_MAX_MB = 12;
+const IMG_MAX_DIM = 1400;
+
+function imgKey(sid, exId){ return 'img_'+sid+'_'+exId; }
+function getImageAttachment(sid, exId){
+  try{
+    const raw = localStorage.getItem(imgKey(sid, exId));
+    return raw ? JSON.parse(raw) : null;
+  }catch(e){ return null; }
+}
+function setImageAttachment(sid, exId, filename, mediaType, data){
+  try{ localStorage.setItem(imgKey(sid, exId), JSON.stringify({filename, mediaType, data})); }catch(e){ return false; }
+  return true;
+}
+function removeImageAttachment(sid, exId){
+  localStorage.removeItem(imgKey(sid, exId));
+}
+function removeImage(sid, exId){
+  removeImageAttachment(sid, exId);
+  renderImageStatus(sid, exId);
+}
+function renderImageStatus(sid, exId){
+  const el = document.getElementById('imgstatus_'+exId);
+  if(!el) return;
+  el.className = 'pdf-status';
+  const att = getImageAttachment(sid, exId);
+  if(att){
+    const thumbSrc = `data:${att.mediaType};base64,${att.data}`;
+    el.innerHTML = `<span class="pdf-chip"><img class="img-thumb" src="${thumbSrc}" alt=""> ${escapeHtml(att.filename)} <button type="button" onclick="removeImage('${sid}','${exId}')" title="Quitar imagen">×</button></span>`;
+  } else {
+    el.innerHTML = '';
+  }
+}
+async function handleImageUpload(sid, exId, inputEl){
+  const file = inputEl.files && inputEl.files[0];
+  if(!file) return;
+  const statusEl = document.getElementById('imgstatus_'+exId);
+  if(!file.type.startsWith('image/')){
+    statusEl.className = 'pdf-status error';
+    statusEl.textContent = 'Ese archivo no es una imagen.';
+    inputEl.value = '';
+    return;
+  }
+  if(file.size > IMG_MAX_MB * 1024 * 1024){
+    statusEl.className = 'pdf-status error';
+    statusEl.textContent = `La imagen pesa demasiado (máx. ${IMG_MAX_MB}MB).`;
+    inputEl.value = '';
+    return;
+  }
+  statusEl.className = 'pdf-status loading';
+  statusEl.textContent = 'Procesando imagen...';
+  try{
+    const dataUrl = await new Promise((resolve, reject)=>{
+      const reader = new FileReader();
+      reader.onload = ()=> resolve(reader.result);
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+    const imgEl = new Image();
+    await new Promise((resolve, reject)=>{ imgEl.onload = resolve; imgEl.onerror = reject; imgEl.src = dataUrl; });
+    let { width, height } = imgEl;
+    if(width > IMG_MAX_DIM || height > IMG_MAX_DIM){
+      const scale = IMG_MAX_DIM / Math.max(width, height);
+      width = Math.round(width * scale);
+      height = Math.round(height * scale);
+    }
+    const canvas = document.createElement('canvas');
+    canvas.width = width; canvas.height = height;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(imgEl, 0, 0, width, height);
+    const compressed = canvas.toDataURL('image/jpeg', 0.75);
+    const base64 = compressed.split(',')[1];
+    const ok = setImageAttachment(sid, exId, file.name, 'image/jpeg', base64);
+    if(!ok){
+      statusEl.className = 'pdf-status error';
+      statusEl.textContent = 'No hay espacio de almacenamiento suficiente en el navegador para esta imagen.';
+      inputEl.value = '';
+      return;
+    }
+    renderImageStatus(sid, exId);
+  }catch(err){
+    statusEl.className = 'pdf-status error';
+    statusEl.textContent = 'No se pudo procesar esta imagen.';
+  }
+  inputEl.value = '';
+}
+
+function boot(){
+  document.getElementById('app').style.display='block';
+  renderSidebar();
+  if(!STATE.fichaDone){
+    goTo('ficha');
+  } else if(STATE.currentSession && (STATE.currentSession==='welcome' || STATE.currentSession==='book' || STATE.currentSession==='ficha' || SESSIONS[STATE.currentSession])){
+    goTo(STATE.currentSession);
+  } else {
+    goTo('welcome');
+  }
+}
+
+function renderSidebar(){
+  const nav = document.getElementById('phaseNav');
+  nav.innerHTML='';
+  PHASES.forEach(phase=>{
+    const wrap = document.createElement('div');
+    wrap.className = 'phase' + (phase.locked ? '' : ' open');
+    const head = document.createElement('div');
+    head.className = 'phase-head';
+    head.onclick = ()=>{ wrap.classList.toggle('open'); };
+    head.innerHTML = `<span class="phase-num">${phase.num}</span><span class="phase-name">${phase.name}</span>` +
+      (phase.locked ? `<span class="phase-lock">🔒</span>` : '') + `<span class="chev">▸</span>`;
+    wrap.appendChild(head);
+
+    const list = document.createElement('div');
+    list.className = 'session-list';
+    if(!phase.locked){
+      phase.sessions.forEach(s=>{
+        const item = document.createElement('div');
+        if(s.pending){
+          item.className = 'session-item locked';
+          item.innerHTML = `<span class="session-check"></span><span>${s.num}. ${s.title} <em style="opacity:.7;font-style:italic;">(texto pendiente)</em></span>`;
+        } else {
+          const active = STATE.currentSession === s.id;
+          item.className = 'session-item' + (active?' active':'');
+          const dot = sessionDone(s.id) ? 'done' : '';
+          item.innerHTML = `<span class="session-check ${dot}"></span><span>${s.num}. ${s.title}</span>`;
+          item.onclick = ()=> goTo(s.id);
+        }
+        list.appendChild(item);
+      });
+    } else {
+      const note = document.createElement('div');
+      note.className = 'locked-note';
+      note.textContent = phase.sessions.map(s=>s.num+'. '+s.title).join(' · ') + ' — Incluida en la versión completa.';
+      wrap.appendChild(note);
+    }
+    wrap.appendChild(list);
+    nav.appendChild(wrap);
+  });
+  updateProgress();
+}
+
+function updateProgress(){
+  let total=0, sum=0;
+  SESSION_ORDER.forEach(sid=>{ total++; sum += sessionCompletion(sid); });
+  const pct = total ? Math.round((sum/total)*100) : 0;
+  document.getElementById('progressPct').textContent = pct+'%';
+  document.getElementById('progressFill').style.width = pct+'%';
+}
+
+function goTo(id){
+  STATE.currentSession = id; saveState();
+  document.querySelectorAll('.session-item').forEach(el=>el.classList.remove('active'));
+  if(id==='ficha'){ renderFicha(); }
+  else if(id==='book'){ renderBook(); }
+  else if(id==='welcome'){ renderWelcome(); }
+  else { renderSession(id); }
+  renderSidebar();
+  document.getElementById('pageContent').scrollIntoView({behavior:'instant'});
+  window.scrollTo(0,0);
+}
+
+
+function chipGroupHtml(fieldKey, options, multi){
+  const p = STATE.profile;
+  const current = multi ? (p[fieldKey]||[]) : p[fieldKey];
+  return `<div class="chip-group" data-field="${fieldKey}" data-multi="${multi?'1':'0'}">
+    ${options.map(opt=>{
+      const sel = multi ? current.includes(opt) : current===opt;
+      return `<div class="chip ${sel?'selected':''}" onclick="toggleChip('${fieldKey}','${opt.replace(/'/g,"\\'")}',${multi?'true':'false'}, this)">${opt}</div>`;
+    }).join('')}
+  </div>`;
+}
+
+function toggleChip(fieldKey, value, multi, el){
+  if(multi){
+    let arr = STATE.profile[fieldKey] || [];
+    if(arr.includes(value)) arr = arr.filter(v=>v!==value);
+    else arr.push(value);
+    STATE.profile[fieldKey] = arr;
+    el.classList.toggle('selected');
+  } else {
+    STATE.profile[fieldKey] = value;
+    el.parentElement.querySelectorAll('.chip').forEach(c=>c.classList.remove('selected'));
+    el.classList.add('selected');
+  }
+  saveState();
+}
+
+function renderFicha(){
+  document.getElementById('crumb').innerHTML = 'Antes de empezar';
+  const p = STATE.profile;
+  document.getElementById('pageContent').innerHTML = `
+    <div class="ficha-wrap">
+      <div class="ficha-card">
+        <p class="brand-eyebrow" style="color:var(--gold);">Antes de empezar</p>
+        <h1 class="session-title" style="font-size:26px;">Tu ficha de situación</h1>
+        <p class="ficha-lede">No vas a leer un manual. Vas a construir, preparar o ayudar a construir una candidatura municipal, sesión a sesión. Para que el Mentor IA pueda darte consejo realmente útil —y no respuestas genéricas— necesito conocer tu punto de partida real.</p>
+
+        <div class="field">
+          <label class="field-label">Tu nombre</label>
+          <input type="text" id="f-nombre" value="${escapeAttr(p.nombre)}" placeholder="Cómo quieres que te llame el Mentor IA">
+        </div>
+        <div class="field">
+          <label class="field-label">Tu municipio</label>
+          <input type="text" id="f-municipio" value="${escapeAttr(p.municipio)}" placeholder="Nombre del municipio">
+        </div>
+        <div class="field">
+          <label class="field-label">Tamaño del municipio</label>
+          ${chipGroupHtml('habitantes', FICHA_FIELDS.habitantes, false)}
+        </div>
+        <div class="field">
+          <label class="field-label">Tu experiencia política</label>
+          ${chipGroupHtml('experiencia', FICHA_FIELDS.experiencia, false)}
+        </div>
+        <div class="field">
+          <label class="field-label">¿Bajo qué fórmula te presentarás?</label>
+          <p class="field-hint">Partido político, candidatura independiente, agrupación de electores, plataforma local... </p>
+          <input type="text" id="f-candidatura" value="${escapeAttr(p.candidatura)}" placeholder="Ej: partido local, candidatura independiente, partido político...">
+        </div>
+        <div class="field">
+          <label class="field-label">Tu profesión u ocupación</label>
+          <input type="text" id="f-profesion" value="${escapeAttr(p.profesion)}" placeholder="A qué te dedicas actualmente">
+        </div>
+        <div class="field">
+          <label class="field-label">¿Con cuántas personas cuentas ahora mismo?</label>
+          <input type="text" id="f-equipo" value="${escapeAttr(p.equipo)}" placeholder="Ej: 3 personas de confianza, o ninguna todavía">
+        </div>
+        <div class="field">
+          <label class="field-label">Tiempo disponible por semana</label>
+          ${chipGroupHtml('tiempo', FICHA_FIELDS.tiempo, false)}
+        </div>
+        <div class="field">
+          <label class="field-label">Presupuesto aproximado con el que cuentas</label>
+          <input type="text" id="f-presupuesto" value="${escapeAttr(p.presupuesto)}" placeholder="Ej: sin presupuesto definido todavía">
+        </div>
+        <div class="field">
+          <label class="field-label">Recursos con los que ya cuentas</label>
+          <p class="field-hint">Puedes marcar varios</p>
+          ${chipGroupHtml('recursos', FICHA_FIELDS.recursos, true)}
+        </div>
+        <div class="field">
+          <label class="field-label">¿En qué momento del camino te encuentras?</label>
+          ${chipGroupHtml('momento', FICHA_FIELDS.momento, false)}
+        </div>
+        <div class="field">
+          <label class="field-label">En una frase, ¿por qué quieres presentarte?</label>
+          <textarea id="f-motivacion" placeholder="Tu respuesta ahora no tiene que ser perfecta, la irás afinando en la Sesión 1.">${escapeHtml(p.motivacion)}</textarea>
+        </div>
+
+        <div class="ficha-actions">
+          <button class="ficha-skip" onclick="skipFicha()">Rellenarla más tarde</button>
+          <button class="btn-gold" onclick="saveFicha()">Guardar y empezar →</button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function escapeAttr(str){
+  return (str||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');
+}
+
+function collectFichaInputs(){
+  const p = STATE.profile;
+  p.nombre = document.getElementById('f-nombre').value.trim();
+  p.municipio = document.getElementById('f-municipio').value.trim();
+  p.candidatura = document.getElementById('f-candidatura').value.trim();
+  p.profesion = document.getElementById('f-profesion').value.trim();
+  p.equipo = document.getElementById('f-equipo').value.trim();
+  p.presupuesto = document.getElementById('f-presupuesto').value.trim();
+  p.motivacion = document.getElementById('f-motivacion').value.trim();
+}
+
+function saveFicha(){
+  collectFichaInputs();
+  STATE.fichaDone = true;
+  saveState();
+  goTo('welcome');
+}
+function skipFicha(){
+  collectFichaInputs();
+  STATE.fichaDone = true;
+  saveState();
+  goTo('welcome');
+}
+
+function renderBook(){
+  document.getElementById('crumb').innerHTML = 'Mi Libro Estratégico';
+
+  let completed = 0;
+  const tocRows = [];
+  const chapterRows = [];
+
+  SESSION_ORDER.forEach(sid=>{
+    const s = SESSIONS[sid];
+    const piece = s.exercises.find(e=>e.id === s.piece) || s.exercises[s.exercises.length - 1];
+    const answer = getAnswer(sid, piece.id);
+    const hasContent = !!(answer && answer.trim());
+    const img = getImageAttachment(sid, piece.id);
+    const pdf = getPdfAttachment(sid, piece.id);
+    if(hasContent) completed++;
+
+    tocRows.push(`
+      <div class="book-toc-item ${hasContent?'done':''}" onclick="goTo('${sid}')">
+        <span class="dot"></span>
+        <span>Sesión ${s.num} — ${piece.title}</span>
+      </div>
+    `);
+
+    let attachNote = '';
+    if(pdf || img){
+      const parts = [];
+      if(pdf) parts.push(`PDF: ${escapeHtml(pdf.filename)}`);
+      if(img) parts.push(`Imagen: ${escapeHtml(img.filename)}`);
+      attachNote = `<div class="book-chapter-attach">📎 ${parts.join(' · ')}</div>`;
+    }
+
+    chapterRows.push(`
+      <div class="book-chapter ${hasContent?'':'book-chapter-empty'}">
+        <div class="book-chapter-num">Sesión ${s.num} · ${s.phase}</div>
+        <h3 class="book-chapter-title">${piece.title}</h3>
+        <div class="book-chapter-body">${
+          hasContent
+            ? escapeHtml(answer).replace(/\n/g,'<br>')
+            : `<em>Pendiente — completa la Sesión ${s.num}: "${s.title}" para añadir esta pieza.</em>`
+        }</div>
+        ${attachNote}
+      </div>
+    `);
+  });
+
+  const pct = Math.round((completed / SESSION_ORDER.length) * 100);
+
+  document.getElementById('pageContent').innerHTML = `
+    <div class="page">
+      <div class="book-cover">
+        <p class="brand-eyebrow" style="justify-content:center;display:flex;">Prionomy · Mentor SerAlcalde®</p>
+        <h1 class="session-title">Libro Estratégico de mi Candidatura®</h1>
+        <p class="session-subtitle">${completed} de ${SESSION_ORDER.length} piezas completadas (${pct}%)</p>
+        <div class="progress-track" style="max-width:320px;margin:18px auto 0;">
+          <div class="progress-fill" style="width:${pct}%"></div>
+        </div>
+      </div>
+      <div class="book-toc">${tocRows.join('')}</div>
+      ${chapterRows.join('')}
+    </div>
+  `;
+}
+
+function renderWelcome(){
+  document.getElementById('crumb').innerHTML = 'Bienvenida';
+  document.getElementById('pageContent').innerHTML = `
+    <div class="welcome">
+      <p class="brand-eyebrow">Prionomy · Mentor SerAlcalde® · DEMO GRATUITA</p>
+      <h1>Tu preparación para convertirte en el alcalde que tu municipio necesita</h1>
+      <p>Esta es la demo gratuita de Mentor SerAlcalde®, un sistema de preparación integral para personas que están pensando en presentarse, ya forman parte de una candidatura o están asesorando a un equipo municipal. Incluye la Fase I completa — <strong>Decidir</strong> — con sus 4 sesiones, ejercicios prácticos y 3 consultas gratuitas al Mentor IA.</p>
+      <p>El programa completo tiene 7 fases y 28 sesiones: desde comprender tu punto de partida y construir el equipo y el proyecto de municipio hasta preparar la campaña, afrontar las elecciones y ejercer el liderazgo municipal con propósito.</p>
+      <div class="journey">
+        ${PHASES.map(p=>`
+          <div class="journey-row ${p.locked?'':'active'}">
+            <div class="journey-num">${p.num}</div>
+            <div class="journey-name">${p.name}</div>
+            <div class="journey-state">${p.locked?'Versión completa':'Incluido en la demo'}</div>
+          </div>`).join('')}
+      </div>
+      <button class="btn-gold" onclick="goTo('s1')">Comenzar Sesión 1: Decidir →</button>
+      <p style="margin-top:24px;"><a href="https://seralcalde.es" target="_blank" style="color:var(--navy);text-decoration:underline;font-family:var(--mono);font-size:12px;">Ver la versión completa →</a></p>
+    </div>
+  `;
+}
+
+
+function renderSession(sid){
+  const s = SESSIONS[sid];
+  const idx = SESSION_ORDER.indexOf(sid);
+  const prev = idx>0 ? SESSION_ORDER[idx-1] : null;
+  const next = idx < SESSION_ORDER.length-1 ? SESSION_ORDER[idx+1] : null;
+
+  document.getElementById('crumb').innerHTML = `${s.phase} <span style="color:#B0A57B">·</span> <b>Sesión ${s.num}</b>`;
+
+  const exHtml = s.exercises.map(ex=>`
+    <div class="exercise-card ${ex.id===s.piece?'is-book-piece':''}">
+      ${ex.id===s.piece ? '<div class="book-piece-badge">📘 Esta pieza se incorpora a tu Libro Estratégico de mi Candidatura®</div>' : ''}
+      <div class="lbl">${ex.label}</div>
+      <h4>${ex.title}</h4>
+      <p class="prompt">${ex.prompt}</p>
+      <textarea id="ex_${ex.id}" oninput="handleAnswer('${sid}','${ex.id}', this)" placeholder="Escribe aquí tu respuesta...">${escapeHtml(getAnswer(sid, ex.id))}</textarea>
+      <span class="save-hint" id="hint_${ex.id}">Guardado ✓</span>
+      <div class="pdf-attach-row">
+        <label class="pdf-upload-btn" for="pdffile_${ex.id}">📎 Adjuntar PDF para el Mentor IA</label>
+        <input type="file" accept="application/pdf" id="pdffile_${ex.id}" style="display:none" onchange="handlePdfUpload('${sid}','${ex.id}', this)">
+        <span class="pdf-status" id="pdfstatus_${ex.id}"></span>
+        <label class="pdf-upload-btn" for="imgfile_${ex.id}">📷 Adjuntar imagen para el Mentor IA</label>
+        <input type="file" accept="image/*" id="imgfile_${ex.id}" style="display:none" onchange="handleImageUpload('${sid}','${ex.id}', this)">
+        <span class="pdf-status" id="imgstatus_${ex.id}"></span>
+      </div>
+    </div>
+  `).join('');
+
+  const checklistHtml = s.checklist.map((item,i)=>{
+    const checked = getCheck(sid,i);
+    return `<label class="check-item ${checked?'checked':''}" id="chkrow_${i}">
+      <input type="checkbox" ${checked?'checked':''} onchange="handleCheck('${sid}', ${i}, this)">
+      <span>${item}</span>
+    </label>`;
+  }).join('');
+
+  const pf = findPhaseForSession(sid);
+  const folioText = pf ? `${pf.phase.num} · ${pf.phase.name} — Sesión ${s.num} de ${pf.list[pf.list.length-1].num}` : `Sesión ${s.num}`;
+
+  document.getElementById('pageContent').innerHTML = `
+    <div class="page">
+      <div class="folio-top">${folioText}</div>
+      <div class="session-eyebrow">Sesión ${s.num}</div>
+      <h1 class="session-title">${s.title}</h1>
+      <p class="session-subtitle">${s.subtitle}</p>
+      <blockquote class="pull-quote">${s.quote}</blockquote>
+      <div class="body-text">${s.body}</div>
+      ${exHtml}
+      <div class="idea-clave">
+        <div class="lbl">Idea clave de la sesión</div>
+        <p>${s.idea}</p>
+      </div>
+      <p class="frase">${s.frase}</p>
+      <div class="checklist">
+        <h4>Checklist de la sesión</h4>
+        ${checklistHtml}
+      </div>
+      <div class="advance-box">
+        <div class="lbl">Avance de la siguiente sesión</div>
+        <p>${s.advance}</p>
+      </div>
+      <div class="nav-pagers">
+        <button class="pager-btn prev" ${prev?'':'disabled'} onclick="${prev?`goTo('${prev}')`:''}">← ${prev?('Sesión '+SESSIONS[prev].num+': '+SESSIONS[prev].title):'Inicio del programa'}</button>
+        <button class="pager-btn next" ${next?'':'disabled'} onclick="${next?`goTo('${next}')`:''}">${next?('Sesión '+SESSIONS[next].num+': '+SESSIONS[next].title):'Fin de Fase I'} →</button>
+      </div>
+    </div>
+  `;
+
+  s.exercises.forEach(ex=>{
+    renderPdfStatus(sid, ex.id);
+    renderImageStatus(sid, ex.id);
+  });
+}
+
+function escapeHtml(str){
+  const d = document.createElement('div'); d.innerText = str; return d.innerHTML;
+}
+
+
+let saveTimers = {};
+function handleAnswer(sid, exId, el){
+  setAnswer(sid, exId, el.value);
+  const hint = document.getElementById('hint_'+exId);
+  hint.classList.add('show');
+  clearTimeout(saveTimers[exId]);
+  saveTimers[exId] = setTimeout(()=> hint.classList.remove('show'), 1400);
+}
+function handleCheck(sid, i, el){
+  setCheck(sid, i, el.checked);
+  document.getElementById('chkrow_'+i).classList.toggle('checked', el.checked);
+  updateProgress();
+  renderSidebar();
+}
+
+/* ============================================================
+   MENTOR IA
+   ============================================================ */
+
+const DEMO_MENTOR_LIMIT = 3;
+
+function openMentor(){
+  document.getElementById('mentorDrawer').classList.add('open');
+  document.getElementById('mentorScrim').classList.add('open');
+  const s = SESSIONS[STATE.currentSession];
+  document.getElementById('mentorContext').textContent = s ? ('Sesión '+s.num+': '+s.title) : 'Programa general';
+  if(document.getElementById('mentorBody').children.length===0){
+    const nombre = (STATE.profile && STATE.profile.nombre) ? STATE.profile.nombre.trim() : '';
+    const saludo = nombre ? `Hola, ${nombre}.` : 'Hola.';
+    addBubble('mentor', s
+      ? `${saludo} Estoy aquí para ayudarte con la sesión «${s.title}». Puedes preguntarme dudas sobre el contenido, pedirme ejemplos aplicados a tu municipio, o pedirme que revise lo que has escrito en los ejercicios.`
+      : `${saludo} Soy tu Mentor IA de SerAlcalde. Elige una sesión y pregúntame lo que necesites sobre ella.`);
+  }
+  updateMentorQuota();
+}
+function closeMentor(){
+  document.getElementById('mentorDrawer').classList.remove('open');
+  document.getElementById('mentorScrim').classList.remove('open');
+}
+function mentorKeydown(e){
+  if(e.key==='Enter' && !e.shiftKey){ e.preventDefault(); sendMentor(); }
+}
+function addBubble(role, text){
+  const body = document.getElementById('mentorBody');
+  const b = document.createElement('div');
+  b.className = 'mbubble '+role;
+  b.textContent = text;
+  body.appendChild(b);
+  body.scrollTop = body.scrollHeight;
+  return b;
+}
+function updateMentorQuota(){
+  const q = document.getElementById('mentorQuota');
+  if(STATE.tier==='full'){
+    q.textContent = 'Licencia activa — consultas ilimitadas.';
+  } else {
+    const left = Math.max(0, DEMO_MENTOR_LIMIT - STATE.mentorMsgCount);
+    q.textContent = `Versión demo — te quedan ${left} consulta${left===1?'':'s'} al Mentor IA.`;
+  }
+}
+
+function fichaContextBlock(){
+  const p = STATE.profile || {};
+  const hasData = p.nombre || p.municipio || p.motivacion || p.experiencia;
+  if(!hasData) return '\nEl usuario todavía no ha completado su ficha de situación: no le des por hecho ningún dato personal ni de su municipio, pregúntale si lo necesitas.\n';
+  const lines = [
+    `- Nombre: ${p.nombre || 'no indicado'}`,
+    `- Municipio: ${p.municipio || 'no indicado'}`,
+    `- Tamaño del municipio: ${p.habitantes || 'no indicado'}`,
+    `- Experiencia política previa: ${p.experiencia || 'no indicada'}`,
+    `- Fórmula de candidatura: ${p.candidatura || 'no indicada'}`,
+    `- Profesión/ocupación: ${p.profesion || 'no indicada'}`,
+    `- Equipo con el que cuenta ahora mismo: ${p.equipo || 'no indicado'}`,
+    `- Tiempo disponible por semana: ${p.tiempo || 'no indicado'}`,
+    `- Presupuesto aproximado: ${p.presupuesto || 'no indicado'}`,
+    `- Recursos con los que ya cuenta: ${(p.recursos && p.recursos.length) ? p.recursos.join(', ') : 'ninguno indicado'}`,
+    `- Momento del camino en el que se encuentra: ${p.momento || 'no indicado'}`,
+    `- Motivación en sus propias palabras: ${p.motivacion || 'no indicada'}`,
+  ];
+  return `\nFicha de situación del candidato:\n${lines.join('\n')}\nUsa estos datos para personalizar tus respuestas (adapta ejemplos al tamaño real de su municipio, a su tiempo y recursos disponibles), pero no repitas la ficha completa al usuario ni la menciones explícitamente salvo que él pregunte por ella.\n`;
+}
+
+async function sendMentor(){
+  const input = document.getElementById('mentorInput');
+  const text = input.value.trim();
+  if(!text) return;
+
+  if(STATE.mentorMsgCount >= DEMO_MENTOR_LIMIT){
+    addBubble('system', 'Has alcanzado el límite de 3 consultas de la demo gratuita. Desbloquea consultas ilimitadas en la versión completa: seralcalde.es');
+    return;
+  }
+
+  addBubble('user', text);
+  input.value='';
+  const sendBtn = document.getElementById('mentorSendBtn');
+  sendBtn.disabled = true;
+  const typing = addBubble('mentor','Escribiendo...');
+  typing.classList.add('mentor-typing');
+
+  const s = SESSIONS[STATE.currentSession];
+  let contextBlock = 'El usuario está usando Mentor SerAlcalde®, un sistema de preparación integral creado por Pepe Crespo para personas que quieren preparar una candidatura municipal en España, ya sea desde un partido político, una candidatura independiente, una agrupación de electores, una plataforma local o como asesor de un equipo.\n';
+  contextBlock += fichaContextBlock();
+  let sessionImageBlocks = [];
+  if(s){
+    contextBlock += `\nEstá en la Sesión ${s.num}: "${s.title}" (${s.subtitle}), dentro de la ${s.phase}.\n`;
+    contextBlock += `Idea clave de la sesión: ${s.idea}\n`;
+    let answered = [];
+    const PDF_CONTEXT_CHAR_CAP = 4000;
+    s.exercises.forEach(ex=>{
+      const a = getAnswer(STATE.currentSession, ex.id);
+      const att = getPdfAttachment(STATE.currentSession, ex.id);
+      const img = getImageAttachment(STATE.currentSession, ex.id);
+      let block = '';
+      if(a && a.trim()) block += `Respuesta escrita del usuario: ${a.trim()}`;
+      if(att && att.text){
+        const snippet = att.text.length > PDF_CONTEXT_CHAR_CAP
+          ? att.text.slice(0, PDF_CONTEXT_CHAR_CAP) + ' [...documento truncado para esta consulta...]'
+          : att.text;
+        block += (block ? '\n' : '') + `Documento PDF adjunto por el usuario ("${att.filename}"): ${snippet}`;
+      }
+      if(img){
+        block += (block ? '\n' : '') + `Imagen adjunta por el usuario ("${img.filename}"): se incluye a continuación en el mensaje para que puedas verla directamente.`;
+        sessionImageBlocks.push({ type:'image', source:{ type:'base64', media_type: img.mediaType, data: img.data } });
+      }
+      if(block) answered.push(`- ${ex.title}:\n${block}`);
+    });
+    if(answered.length){
+      contextBlock += `\nRespuestas y documentos que el usuario ya ha aportado en esta sesión:\n${answered.join('\n\n')}\n`;
+    }
+  }
+  contextBlock += `\nActúa como un mentor estratégico cercano, práctico, no partidista y honesto. Puedes ayudar tanto a candidatos como a personas que forman parte de una lista o asesoran una candidatura. Da respuestas concretas, aplicables a un municipio real, en español de España, en un máximo de 180 palabras. Si el usuario comparte texto de sus ejercicios, ayúdale a mejorarlo con preguntas o sugerencias concretas, sin reescribirlo por él salvo que lo pida explícitamente. Si se te ha adjuntado alguna imagen, coméntala explícitamente en tu respuesta.`;
+
+  STATE.mentorHistory.push({role:'user', content: text});
+  if(STATE.mentorHistory.length > 12) STATE.mentorHistory = STATE.mentorHistory.slice(-12);
+
+  // Las imágenes solo se adjuntan a la llamada API del turno actual, nunca se guardan
+  // en el historial persistido, para no llenar el localStorage del navegador.
+  const apiMessages = STATE.mentorHistory.map((m, i)=>{
+    if(i === STATE.mentorHistory.length - 1 && sessionImageBlocks.length){
+      return { role: m.role, content: [...sessionImageBlocks, { type:'text', text: m.content }] };
+    }
+    return m;
+  });
+
+  try{
+    const response = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: "claude-sonnet-4-6",
+        max_tokens: 500,
+        system: contextBlock,
+        messages: apiMessages
+      })
+    });
+    const data = await response.json();
+    typing.remove();
+    let reply = '';
+    if(data && data.content){
+      reply = data.content.filter(c=>c.type==='text').map(c=>c.text).join('\n').trim();
+    }
+    if(!reply) reply = 'No he podido generar una respuesta ahora mismo. Inténtalo de nuevo en unos segundos.';
+    addBubble('mentor', reply);
+    STATE.mentorHistory.push({role:'assistant', content: reply});
+    STATE.mentorMsgCount++;
+    saveState();
+    updateMentorQuota();
+  }catch(err){
+    typing.remove();
+    addBubble('system', 'Ha habido un problema de conexión con el Mentor IA. Inténtalo de nuevo.');
+  }
+  sendBtn.disabled = false;
+}
+
+/* ============================================================
+   INIT
+   ============================================================ */
+loadState();
+document.addEventListener('DOMContentLoaded', boot);
+</script>
+</body>
+</html>
